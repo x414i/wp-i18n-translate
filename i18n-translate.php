@@ -3,7 +3,7 @@
  * Plugin Name: i18n Translate
  * Description: Translation management with JSON-key translations, language switching via ?lang=, REST/AJAX endpoints, and page builder compatibility.
  * Version: 1.0.0
- * Author: WP Template
+ * Author: Satus
  * License: GPLv2 or later
  * Text Domain: i18n-translate
  */
