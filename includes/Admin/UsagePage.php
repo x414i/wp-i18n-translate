@@ -96,6 +96,12 @@ final class UsagePage {
 				<button @click="tab = 'images'" :class="{ 'active': tab === 'images' }">
 					<span class="dashicons dashicons-format-image"></span> <?php esc_html_e( 'Images & Media', 'i18n-translate' ); ?>
 				</button>
+				<button @click="tab = 'ecom'" :class="{ 'active': tab === 'ecom' }">
+					<span class="dashicons dashicons-cart"></span> <?php esc_html_e( 'eCommerce', 'i18n-translate' ); ?>
+				</button>
+				<button @click="tab = 'blogs'" :class="{ 'active': tab === 'blogs' }">
+					<span class="dashicons dashicons-admin-post"></span> <?php esc_html_e( 'Blogs & Posts', 'i18n-translate' ); ?>
+				</button>
 				<button @click="tab = 'menus'" :class="{ 'active': tab === 'menus' }">
 					<span class="dashicons dashicons-menu"></span> <?php esc_html_e( 'Menus', 'i18n-translate' ); ?>
 				</button>
@@ -116,6 +122,8 @@ final class UsagePage {
 			<?php $this->render_page_builders(); ?>
 			<?php $this->render_shortcodes(); ?>
 			<?php $this->render_images(); ?>
+			<?php $this->render_ecommerce(); ?>
+			<?php $this->render_blogs(); ?>
 			<?php $this->render_menus(); ?>
 			<?php $this->render_php(); ?>
 			<?php $this->render_import_export(); ?>
@@ -191,6 +199,13 @@ final class UsagePage {
 					<p><?php esc_html_e( 'Use blocks, shortcodes, or PHP functions to display translated content anywhere on your site.', 'i18n-translate' ); ?></p>
 				</div>
 			</div>
+
+			<h3><?php esc_html_e( 'Choose Your Workflow', 'i18n-translate' ); ?></h3>
+			<ul>
+				<li><strong><?php esc_html_e( 'Editors:', 'i18n-translate' ); ?></strong> <?php esc_html_e( 'Use i18n blocks or shortcodes in posts/pages.', 'i18n-translate' ); ?></li>
+				<li><strong><?php esc_html_e( 'Store Owners:', 'i18n-translate' ); ?></strong> <?php esc_html_e( 'Use keys for WooCommerce UI text and marketing copy.', 'i18n-translate' ); ?></li>
+				<li><strong><?php esc_html_e( 'Developers:', 'i18n-translate' ); ?></strong> <?php esc_html_e( 'Use PHP helpers in templates and theme overrides.', 'i18n-translate' ); ?></li>
+			</ul>
 
 			<h3><?php esc_html_e( 'How Language Detection Works', 'i18n-translate' ); ?></h3>
 			<p><?php esc_html_e( 'The current language is determined in this order:', 'i18n-translate' ); ?></p>
@@ -474,6 +489,171 @@ final class UsagePage {
 				&lt;a href="&lt;?php echo __t('downloads.brochure'); ?&gt;"&gt;<br>
 				&nbsp;&nbsp;&lt;?php echo __t('downloads.brochure.label'); ?&gt;<br>
 				&lt;/a&gt;
+			</div>
+		</div>
+		<?php
+	}
+
+	private function render_ecommerce(): void {
+		?>
+		<div x-show="tab === 'ecom'" x-transition class="i18n-section">
+			<h2><span class="emoji">🛒</span> <?php esc_html_e( 'eCommerce (WooCommerce)', 'i18n-translate' ); ?></h2>
+			<p><?php esc_html_e( 'Translate store UI text (labels, headings, buttons) while WooCommerce continues to handle dynamic product data like price, stock, and SKU.', 'i18n-translate' ); ?></p>
+
+			<div class="i18n-info-box">
+				<strong><?php esc_html_e( 'Translate vs Keep in WooCommerce', 'i18n-translate' ); ?></strong>
+				<ul>
+					<li><?php esc_html_e( 'Translate: headings, button labels, badges, notices, trust copy.', 'i18n-translate' ); ?></li>
+					<li><?php esc_html_e( 'Keep: product titles, prices, stock, attributes, variations, reviews, order data.', 'i18n-translate' ); ?></li>
+				</ul>
+			</div>
+
+			<h3><?php esc_html_e( 'Recommended Key Groups', 'i18n-translate' ); ?></h3>
+			<ul>
+				<li><strong><?php esc_html_e( 'shop.*', 'i18n-translate' ); ?></strong> <?php esc_html_e( 'filters, sorting, badges, empty states', 'i18n-translate' ); ?></li>
+				<li><strong><?php esc_html_e( 'product.*', 'i18n-translate' ); ?></strong> <?php esc_html_e( 'headings, tabs, CTA labels, notices', 'i18n-translate' ); ?></li>
+				<li><strong><?php esc_html_e( 'cart.*', 'i18n-translate' ); ?></strong> <?php esc_html_e( 'cart labels and messages', 'i18n-translate' ); ?></li>
+				<li><strong><?php esc_html_e( 'checkout.*', 'i18n-translate' ); ?></strong> <?php esc_html_e( 'checkout headings and field labels', 'i18n-translate' ); ?></li>
+			</ul>
+
+			<h3><?php esc_html_e( 'Template Examples (PHP)', 'i18n-translate' ); ?></h3>
+			<div class="i18n-code-box">
+				<button class="copy-btn" @click="copy('echo __t( \'product.add_to_cart\', \'Add to cart\' );')">Copy</button>
+<span class="comment">// Product page CTA</span><br>
+&lt;?php echo __t( 'product.add_to_cart', 'Add to cart' ); ?&gt;<br><br>
+<span class="comment">// Shop filters</span><br>
+&lt;?php echo __t( 'shop.sort_by', 'Sort by' ); ?&gt;<br>
+&lt;?php echo __t( 'shop.filter_by', 'Filter by' ); ?&gt;<br><br>
+<span class="comment">// Cart / Checkout messaging</span><br>
+&lt;?php echo __t( 'cart.empty', 'Your cart is empty' ); ?&gt;<br>
+&lt;?php echo __t( 'checkout.secure', 'Secure checkout' ); ?&gt;
+			</div>
+
+			<h3><?php esc_html_e( 'Shortcode Examples (Content Builders)', 'i18n-translate' ); ?></h3>
+			<div class="i18n-code-box">
+<span class="comment">// Product short description</span><br>
+[i18n "product.shipping_note" default="Free shipping over $50"]<br>
+[i18n "product.return_policy" default="30-day returns"]<br><br>
+<span class="comment">// Checkout reassurance</span><br>
+[i18n "checkout.secure" default="Secure checkout"]
+			</div>
+
+			<h3><?php esc_html_e( 'Localized Product Images', 'i18n-translate' ); ?></h3>
+			<p><?php esc_html_e( 'Use image keys to swap marketing banners or product graphics by language.', 'i18n-translate' ); ?></p>
+			<div class="i18n-code-box">
+				<button class="copy-btn" @click="copy('echo __img( \'product.hero_image\', \'large\' );')">Copy</button>
+&lt;?php echo __img( 'product.hero_image', 'large' ); ?&gt;
+			</div>
+
+			<h3><?php esc_html_e( 'Page-by-Page Key Map', 'i18n-translate' ); ?></h3>
+			<table class="i18n-table">
+				<thead>
+					<tr>
+						<th><?php esc_html_e( 'Page', 'i18n-translate' ); ?></th>
+						<th><?php esc_html_e( 'Suggested Keys', 'i18n-translate' ); ?></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td><?php esc_html_e( 'Shop (archive-product.php)', 'i18n-translate' ); ?></td>
+						<td><code>shop.title</code>, <code>shop.sort_by</code>, <code>shop.filter_by</code></td>
+					</tr>
+					<tr>
+						<td><?php esc_html_e( 'Product (single-product.php)', 'i18n-translate' ); ?></td>
+						<td><code>product.add_to_cart</code>, <code>product.tabs.*</code></td>
+					</tr>
+					<tr>
+						<td><?php esc_html_e( 'Cart (cart.php)', 'i18n-translate' ); ?></td>
+						<td><code>cart.title</code>, <code>cart.empty</code>, <code>cart.continue_shopping</code></td>
+					</tr>
+					<tr>
+						<td><?php esc_html_e( 'Checkout (checkout.php)', 'i18n-translate' ); ?></td>
+						<td><code>checkout.title</code>, <code>checkout.secure</code>, <code>checkout.notice.*</code></td>
+					</tr>
+					<tr>
+						<td><?php esc_html_e( 'Thank You (thankyou.php)', 'i18n-translate' ); ?></td>
+						<td><code>checkout.thank_you</code>, <code>checkout.order_summary</code></td>
+					</tr>
+				</tbody>
+			</table>
+
+			<div class="i18n-info-box warning">
+				<strong><?php esc_html_e( 'Note:', 'i18n-translate' ); ?></strong>
+				<?php esc_html_e( 'Keep prices, inventory, and variations managed by WooCommerce. Use i18n Translate for labels, headings, and marketing copy.', 'i18n-translate' ); ?>
+			</div>
+		</div>
+		<?php
+	}
+
+	private function render_blogs(): void {
+		?>
+		<div x-show="tab === 'blogs'" x-transition class="i18n-section">
+			<h2><span class="emoji">📰</span> <?php esc_html_e( 'Blogs & Posts', 'i18n-translate' ); ?></h2>
+			<p><?php esc_html_e( 'Use translation keys for recurring blog UI labels and layout text. Keep post content in the editor as normal.', 'i18n-translate' ); ?></p>
+
+			<div class="i18n-info-box">
+				<strong><?php esc_html_e( 'Translate vs Keep in Content', 'i18n-translate' ); ?></strong>
+				<ul>
+					<li><?php esc_html_e( 'Translate: template labels, buttons, CTAs, archive headings, empty states.', 'i18n-translate' ); ?></li>
+					<li><?php esc_html_e( 'Keep: post body text, quotes, and one-off editorial copy.', 'i18n-translate' ); ?></li>
+				</ul>
+			</div>
+
+			<h3><?php esc_html_e( 'Recommended Key Groups', 'i18n-translate' ); ?></h3>
+			<ul>
+				<li><strong><?php esc_html_e( 'blog.*', 'i18n-translate' ); ?></strong> <?php esc_html_e( 'read more, categories, tags, author labels', 'i18n-translate' ); ?></li>
+				<li><strong><?php esc_html_e( 'post.*', 'i18n-translate' ); ?></strong> <?php esc_html_e( 'share labels, table-of-contents headings', 'i18n-translate' ); ?></li>
+				<li><strong><?php esc_html_e( 'archive.*', 'i18n-translate' ); ?></strong> <?php esc_html_e( 'archive titles, filters, empty states', 'i18n-translate' ); ?></li>
+			</ul>
+
+			<h3><?php esc_html_e( 'Template Examples (PHP)', 'i18n-translate' ); ?></h3>
+			<div class="i18n-code-box">
+				<button class="copy-btn" @click="copy('echo __t( \'blog.read_more\', \'Read more\' );')">Copy</button>
+<span class="comment">// Archive cards</span><br>
+&lt;?php echo __t( 'blog.read_more', 'Read more' ); ?&gt;<br>
+&lt;?php echo __t( 'blog.published_on', 'Published on' ); ?&gt;<br><br>
+<span class="comment">// Empty state</span><br>
+&lt;?php echo __t( 'archive.no_results', 'No posts found' ); ?&gt;
+			</div>
+
+			<h3><?php esc_html_e( 'Block/Editor Examples', 'i18n-translate' ); ?></h3>
+			<div class="i18n-code-box">
+<span class="comment">// In post content or patterns</span><br>
+[i18n "blog.subscribe_cta" default="Subscribe for updates"]<br>
+[i18n "post.share" default="Share this post"]
+			</div>
+
+			<h3><?php esc_html_e( 'Template Key Map', 'i18n-translate' ); ?></h3>
+			<table class="i18n-table">
+				<thead>
+					<tr>
+						<th><?php esc_html_e( 'Template', 'i18n-translate' ); ?></th>
+						<th><?php esc_html_e( 'Suggested Keys', 'i18n-translate' ); ?></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td><?php esc_html_e( 'Archive (archive.php)', 'i18n-translate' ); ?></td>
+						<td><code>archive.title</code>, <code>archive.no_results</code>, <code>blog.read_more</code></td>
+					</tr>
+					<tr>
+						<td><?php esc_html_e( 'Single (single.php)', 'i18n-translate' ); ?></td>
+						<td><code>blog.published_on</code>, <code>post.share</code>, <code>post.author</code></td>
+					</tr>
+					<tr>
+						<td><?php esc_html_e( 'Pagination', 'i18n-translate' ); ?></td>
+						<td><code>archive.prev</code>, <code>archive.next</code></td>
+					</tr>
+					<tr>
+						<td><?php esc_html_e( 'Author Box', 'i18n-translate' ); ?></td>
+						<td><code>post.about_author</code>, <code>post.author_posts</code></td>
+					</tr>
+				</tbody>
+			</table>
+
+			<div class="i18n-info-box">
+				<strong><?php esc_html_e( 'Tip:', 'i18n-translate' ); ?></strong>
+				<?php esc_html_e( 'Use consistent keys in your theme templates so every post automatically inherits the translated labels.', 'i18n-translate' ); ?>
 			</div>
 		</div>
 		<?php
