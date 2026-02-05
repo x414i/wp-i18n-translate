@@ -55,6 +55,10 @@ final class DashboardPage {
 						<span class="dashicons dashicons-edit"></span>
 						<span><?php esc_html_e( 'Translations', 'i18n-translate' ); ?></span>
 					</a>
+					<a href="<?php echo esc_url( admin_url( 'admin.php?page=i18n-translate-content' ) ); ?>" class="i18n-link-card">
+						<span class="dashicons dashicons-media-document"></span>
+						<span><?php esc_html_e( 'Content', 'i18n-translate' ); ?></span>
+					</a>
 					<a href="<?php echo esc_url( admin_url( 'admin.php?page=i18n-translate-scanner' ) ); ?>" class="i18n-link-card">
 						<span class="dashicons dashicons-search"></span>
 						<span><?php esc_html_e( 'Scan Strings', 'i18n-translate' ); ?></span>
@@ -71,6 +75,44 @@ final class DashboardPage {
 						<span class="dashicons dashicons-book"></span>
 						<span><?php esc_html_e( 'Usage Guide', 'i18n-translate' ); ?></span>
 					</a>
+				</div>
+			</div>
+
+			<div class="i18n-quick-links" style="margin-top: 30px;">
+				<h2><?php esc_html_e( 'Content Coverage', 'i18n-translate' ); ?></h2>
+				<div class="i18n-content-coverage">
+					<table class="widefat striped">
+						<thead>
+							<tr>
+								<th><?php esc_html_e( 'Language', 'i18n-translate' ); ?></th>
+								<th><?php esc_html_e( 'Posts (Title)', 'i18n-translate' ); ?></th>
+								<th><?php esc_html_e( 'Pages (Title)', 'i18n-translate' ); ?></th>
+								<?php if ( class_exists( 'WooCommerce' ) ) : ?>
+								<th><?php esc_html_e( 'Products (Title)', 'i18n-translate' ); ?></th>
+								<?php endif; ?>
+							</tr>
+						</thead>
+						<tbody>
+							<?php foreach ( $languages as $code => $data ) : ?>
+								<?php
+									$post_total = $this->count_content_total( 'post' );
+									$page_total = $this->count_content_total( 'page' );
+									$product_total = class_exists( 'WooCommerce' ) ? $this->count_content_total( 'product' ) : 0;
+									$post_translated = $this->count_field_translated( 'post', 'title', $code );
+									$page_translated = $this->count_field_translated( 'page', 'title', $code );
+									$product_translated = class_exists( 'WooCommerce' ) ? $this->count_field_translated( 'product', 'title', $code ) : 0;
+								?>
+								<tr>
+									<td><?php echo esc_html( ( $data['flag'] ?? '🌐' ) . ' ' . ( $data['name'] ?? $code ) ); ?></td>
+									<td><?php echo esc_html( $post_translated . '/' . $post_total ); ?></td>
+									<td><?php echo esc_html( $page_translated . '/' . $page_total ); ?></td>
+									<?php if ( class_exists( 'WooCommerce' ) ) : ?>
+									<td><?php echo esc_html( $product_translated . '/' . $product_total ); ?></td>
+									<?php endif; ?>
+								</tr>
+							<?php endforeach; ?>
+						</tbody>
+					</table>
 				</div>
 			</div>
 		</div>
@@ -198,5 +240,31 @@ final class DashboardPage {
 		}
 		
 		return 0;
+	}
+
+	private function count_content_total( string $post_type ): int {
+		$post_type = sanitize_key( $post_type );
+		if ( $post_type === '' ) {
+			return 0;
+		}
+		$count = wp_count_posts( $post_type );
+		if ( ! $count ) {
+			return 0;
+		}
+		return (int) ( $count->publish ?? 0 );
+	}
+
+	private function count_field_translated( string $object_type, string $field_key, string $lang ): int {
+		global $wpdb;
+		$table = $wpdb->prefix . 'i18n_field_translations';
+		if ( $wpdb->get_var( "SHOW TABLES LIKE '$table'" ) !== $table ) {
+			return 0;
+		}
+		return (int) $wpdb->get_var( $wpdb->prepare(
+			"SELECT COUNT(*) FROM {$table} WHERE object_type = %s AND field_key = %s AND lang_code = %s AND translation_text != ''",
+			$object_type,
+			$field_key,
+			$lang
+		) );
 	}
 }

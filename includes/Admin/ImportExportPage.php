@@ -59,6 +59,10 @@ final class ImportExportPage {
 							<span><?php esc_html_e( 'Total Translations:', 'i18n-translate' ); ?></span>
 							<strong><?php echo esc_html( $stats['translations'] ); ?></strong>
 						</div>
+						<div class="i18n-stat-row">
+							<span><?php esc_html_e( 'Content Translations:', 'i18n-translate' ); ?></span>
+							<strong><?php echo esc_html( $stats['field_translations'] ); ?></strong>
+						</div>
 					</div>
 					
 					<form method="post">
@@ -80,6 +84,12 @@ final class ImportExportPage {
 							<label>
 								<input type="checkbox" name="include_languages" value="1" checked>
 								<?php esc_html_e( 'Include language settings', 'i18n-translate' ); ?>
+							</label>
+						</p>
+						<p>
+							<label>
+								<input type="checkbox" name="include_field_translations" value="1" checked>
+								<?php esc_html_e( 'Include content translations', 'i18n-translate' ); ?>
 							</label>
 						</p>
 						
@@ -164,6 +174,12 @@ final class ImportExportPage {
 			$export_data['languages'] = $wpdb->get_results( "SELECT * FROM $table", ARRAY_A ) ?: [];
 		}
 
+		// Export content/field translations
+		if ( ! empty( $_POST['include_field_translations'] ) ) {
+			$table = $wpdb->prefix . 'i18n_field_translations';
+			$export_data['field_translations'] = $wpdb->get_results( "SELECT * FROM $table", ARRAY_A ) ?: [];
+		}
+
 		$filename = 'i18n-translations-' . date( 'Y-m-d' ) . '.json';
 		
 		header( 'Content-Type: application/json' );
@@ -211,16 +227,26 @@ final class ImportExportPage {
 		if ( ! empty( $data['strings'] ) ) {
 			$table = $wpdb->prefix . 'i18n_strings';
 			foreach ( $data['strings'] as $row ) {
+				$domain = isset( $row['domain'] ) ? $row['domain'] : 'default';
 				$exists = $wpdb->get_var( $wpdb->prepare(
-					"SELECT id FROM $table WHERE string_key = %s",
+					"SELECT id FROM $table WHERE domain = %s AND string_key = %s",
+					$domain,
 					$row['string_key']
 				) );
 
 				if ( ! $exists ) {
 					$wpdb->insert( $table, [
+						'domain'       => $domain,
 						'string_key'   => $row['string_key'],
 						'default_text' => $row['default_text'] ?? '',
-						'context'      => $row['context'] ?? '',
+					] );
+					$count++;
+				} elseif ( $overwrite ) {
+					$wpdb->update( $table, [
+						'default_text' => $row['default_text'] ?? '',
+					], [
+						'domain'     => $domain,
+						'string_key' => $row['string_key'],
 					] );
 					$count++;
 				}
@@ -254,6 +280,38 @@ final class ImportExportPage {
 			}
 		}
 
+		// Import content translations
+		if ( ! empty( $data['field_translations'] ) ) {
+			$table = $wpdb->prefix . 'i18n_field_translations';
+			foreach ( $data['field_translations'] as $row ) {
+				$exists = $wpdb->get_var( $wpdb->prepare(
+					"SELECT id FROM $table WHERE object_type = %s AND object_id = %d AND field_key = %s AND lang_code = %s",
+					$row['object_type'],
+					(int) $row['object_id'],
+					$row['field_key'],
+					$row['lang_code']
+				) );
+
+				if ( ! $exists ) {
+					$wpdb->insert( $table, [
+						'object_type'      => $row['object_type'],
+						'object_id'        => (int) $row['object_id'],
+						'field_key'        => $row['field_key'],
+						'lang_code'        => $row['lang_code'],
+						'translation_text' => $row['translation_text'] ?? '',
+						'updated_at'       => current_time( 'mysql' ),
+					] );
+					$count++;
+				} elseif ( $overwrite ) {
+					$wpdb->update( $table,
+						[ 'translation_text' => $row['translation_text'] ?? '', 'updated_at' => current_time( 'mysql' ) ],
+						[ 'object_type' => $row['object_type'], 'object_id' => (int) $row['object_id'], 'field_key' => $row['field_key'], 'lang_code' => $row['lang_code'] ]
+					);
+					$count++;
+				}
+			}
+		}
+
 		wp_redirect( add_query_arg( 'imported', $count, admin_url( 'admin.php?page=i18n-translate-import-export' ) ) );
 		exit;
 	}
@@ -267,11 +325,13 @@ final class ImportExportPage {
 		$languages = $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}i18n_languages WHERE enabled = 1" ) ?: 0;
 		$strings = $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}i18n_strings" ) ?: 0;
 		$translations = $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}i18n_translations" ) ?: 0;
+		$field_translations = $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}i18n_field_translations" ) ?: 0;
 
 		return [
 			'languages'    => (int) $languages,
 			'strings'      => (int) $strings,
 			'translations' => (int) $translations,
+			'field_translations' => (int) $field_translations,
 		];
 	}
 }

@@ -10,6 +10,7 @@ final class Admin {
 	private ?DashboardPage $dashboard_page = null;
 	private ?LanguagesPage $languages_page = null;
 	private ?TranslationsPage $translations_page = null;
+	private ?ContentPage $content_page = null;
 	private ?SettingsPage $settings_page = null;
 	private ?UsagePage $usage_page = null;
 	private ?ScannerPage $scanner_page = null;
@@ -19,6 +20,7 @@ final class Admin {
 		$this->dashboard_page    = new DashboardPage();
 		$this->languages_page    = new LanguagesPage();
 		$this->translations_page = new TranslationsPage();
+		$this->content_page      = new ContentPage();
 		$this->settings_page     = new SettingsPage();
 		$this->usage_page        = new UsagePage();
 		$this->scanner_page      = new ScannerPage();
@@ -85,6 +87,15 @@ final class Admin {
 
 		add_submenu_page(
 			'i18n-translate',
+			__( 'Content Translations', 'i18n-translate' ),
+			__( 'Content', 'i18n-translate' ),
+			'i18n_translate_translate',
+			'i18n-translate-content',
+			[ $this, 'render_content' ]
+		);
+
+		add_submenu_page(
+			'i18n-translate',
 			__( 'Settings', 'i18n-translate' ),
 			__( 'Settings', 'i18n-translate' ),
 			'i18n_translate_manage',
@@ -126,6 +137,7 @@ final class Admin {
 			'toplevel_page_i18n-translate',
 			'i18n-translate_page_i18n-translate-languages',
 			'i18n-translate_page_i18n-translate-translations',
+			'i18n-translate_page_i18n-translate-content',
 			'i18n-translate_page_i18n-translate-settings',
 			'i18n-translate_page_i18n-translate-usage',
 			'i18n-translate_page_i18n-translate-scanner',
@@ -157,6 +169,8 @@ final class Admin {
 		wp_localize_script( 'alpinejs', 'i18nTranslate', [
 			'ajaxUrl' => admin_url( 'admin-ajax.php' ),
 			'nonce'   => wp_create_nonce( 'i18n_translate_nonce' ),
+			'restUrl' => rest_url( 'json-i18n/v1/field-translations' ),
+			'restNonce' => wp_create_nonce( 'wp_rest' ),
 		] );
 	}
 
@@ -224,6 +238,11 @@ final class Admin {
 	public function render_translations(): void {
 		$this->translations_page = $this->translations_page ?? new TranslationsPage();
 		$this->translations_page->render();
+	}
+
+	public function render_content(): void {
+		$this->content_page = $this->content_page ?? new ContentPage();
+		$this->content_page->render();
 	}
 
 	public function render_settings(): void {

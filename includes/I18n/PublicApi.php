@@ -176,5 +176,91 @@ final class PublicApi {
                     // Treat as URL
                     return sprintf( '<img src="%s" class="%s" alt="">', esc_url( $val ), esc_attr( $atts['class'] ) );
                 } );
+
+                add_shortcode( 'i18n_field', function( $atts ) {
+                    $atts = shortcode_atts( [
+                        'object_type' => 'post',
+                        'object_id'   => 0,
+                        'field'       => '',
+                        'default'     => '',
+                        'lang'        => '',
+                    ], (array) $atts );
+
+                    $object_type = sanitize_key( (string) $atts['object_type'] );
+                    $object_id   = (int) $atts['object_id'];
+                    $field_key   = sanitize_text_field( (string) $atts['field'] );
+                    $default     = (string) $atts['default'];
+                    $lang        = sanitize_key( (string) $atts['lang'] );
+
+                    if ( $object_id <= 0 && $object_type === 'post' ) {
+                        $object_id = get_the_ID();
+                    }
+
+                    if ( $object_id <= 0 || $field_key === '' ) {
+                        return '';
+                    }
+
+                    return wp_kses_post( json_i18n_translate_field( $object_type, $object_id, $field_key, $default, $lang ) );
+                } );
+
+                add_shortcode( 'i18n_post_title', function( $atts ) {
+                    $atts = shortcode_atts( [
+                        'id'      => 0,
+                        'default' => '',
+                        'lang'    => '',
+                    ], (array) $atts );
+
+                    $post_id = (int) $atts['id'];
+                    if ( $post_id <= 0 ) {
+                        $post_id = get_the_ID();
+                    }
+
+                    if ( $post_id <= 0 ) {
+                        return '';
+                    }
+
+                    $default = $atts['default'] !== '' ? (string) $atts['default'] : get_the_title( $post_id );
+                    return esc_html( json_i18n_translate_field( 'post', $post_id, 'title', $default, (string) $atts['lang'] ) );
+                } );
+
+                add_shortcode( 'i18n_post_excerpt', function( $atts ) {
+                    $atts = shortcode_atts( [
+                        'id'      => 0,
+                        'default' => '',
+                        'lang'    => '',
+                    ], (array) $atts );
+
+                    $post_id = (int) $atts['id'];
+                    if ( $post_id <= 0 ) {
+                        $post_id = get_the_ID();
+                    }
+
+                    if ( $post_id <= 0 ) {
+                        return '';
+                    }
+
+                    $default = $atts['default'] !== '' ? (string) $atts['default'] : get_the_excerpt( $post_id );
+                    return esc_html( json_i18n_translate_field( 'post', $post_id, 'excerpt', $default, (string) $atts['lang'] ) );
+                } );
+
+                add_shortcode( 'i18n_post_content', function( $atts ) {
+                    $atts = shortcode_atts( [
+                        'id'      => 0,
+                        'default' => '',
+                        'lang'    => '',
+                    ], (array) $atts );
+
+                    $post_id = (int) $atts['id'];
+                    if ( $post_id <= 0 ) {
+                        $post_id = get_the_ID();
+                    }
+
+                    if ( $post_id <= 0 ) {
+                        return '';
+                    }
+
+                    $default = $atts['default'] !== '' ? (string) $atts['default'] : (string) get_post_field( 'post_content', $post_id );
+                    return wp_kses_post( json_i18n_translate_field( 'post', $post_id, 'content', $default, (string) $atts['lang'] ) );
+                } );
         }
 }

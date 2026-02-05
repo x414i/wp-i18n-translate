@@ -28,6 +28,7 @@ final class Installer {
 		$strings_table   = $prefix . 'strings';
 		$tr_table        = $prefix . 'translations';
 		$media_table     = $prefix . 'media';
+		$field_table     = $prefix . 'field_translations';
 
 		$sql = [];
 
@@ -81,6 +82,20 @@ final class Installer {
 			updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 			PRIMARY KEY (id),
 			UNIQUE KEY attachment_lang (attachment_id, lang_code),
+			KEY lang_code (lang_code)
+		) {$charset_collate};";
+
+		$sql[] = "CREATE TABLE {$field_table} (
+			id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+			object_type VARCHAR(32) NOT NULL,
+			object_id BIGINT(20) UNSIGNED NOT NULL,
+			field_key VARCHAR(191) NOT NULL,
+			lang_code VARCHAR(20) NOT NULL,
+			translation_text LONGTEXT NULL,
+			updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+			PRIMARY KEY (id),
+			UNIQUE KEY object_field_lang (object_type, object_id, field_key, lang_code),
+			KEY object_lookup (object_type, object_id),
 			KEY lang_code (lang_code)
 		) {$charset_collate};";
 

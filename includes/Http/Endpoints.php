@@ -42,6 +42,43 @@ final class Endpoints {
 				'domain' => [ 'type' => 'string', 'required' => false ],
 			],
 		] );
+
+		register_rest_route( 'json-i18n/v1', '/field-translations', [
+			'methods'             => 'GET',
+			'permission_callback' => '__return_true',
+			'callback'            => [ $this, 'rest_field_translations' ],
+			'args'                => [
+				'object_type' => [ 'type' => 'string', 'required' => true ],
+				'object_id'   => [ 'type' => 'integer', 'required' => true ],
+				'fields'      => [ 'type' => 'string', 'required' => false ],
+				'lang'        => [ 'type' => 'string', 'required' => false ],
+			],
+		] );
+
+		register_rest_route( 'json-i18n/v1', '/field-translations', [
+			'methods'             => 'POST',
+			'permission_callback' => [ $this, 'rest_can_translate' ],
+			'callback'            => [ $this, 'rest_save_field_translation' ],
+			'args'                => [
+				'object_type' => [ 'type' => 'string', 'required' => true ],
+				'object_id'   => [ 'type' => 'integer', 'required' => true ],
+				'field_key'   => [ 'type' => 'string', 'required' => true ],
+				'lang'        => [ 'type' => 'string', 'required' => true ],
+				'translation' => [ 'type' => 'string', 'required' => true ],
+			],
+		] );
+
+		register_rest_route( 'json-i18n/v1', '/field-translations', [
+			'methods'             => 'DELETE',
+			'permission_callback' => [ $this, 'rest_can_translate' ],
+			'callback'            => [ $this, 'rest_delete_field_translation' ],
+			'args'                => [
+				'object_type' => [ 'type' => 'string', 'required' => true ],
+				'object_id'   => [ 'type' => 'integer', 'required' => true ],
+				'field_key'   => [ 'type' => 'string', 'required' => true ],
+				'lang'        => [ 'type' => 'string', 'required' => true ],
+			],
+		] );
 	}
 
 	public function rest_change_language( \WP_REST_Request $request ) {
@@ -66,6 +103,84 @@ final class Endpoints {
 				'translations' => json_i18n_get_translations( $domain ),
 			],
 		] );
+	}
+
+	public function rest_field_translations( \WP_REST_Request $request ) {
+		$object_type = sanitize_key( (string) $request->get_param( 'object_type' ) );
+		$object_id   = (int) $request->get_param( 'object_id' );
+		$lang        = sanitize_key( (string) $request->get_param( 'lang' ) );
+		$fields      = $request->get_param( 'fields' );
+
+		$field_keys = [];
+		if ( is_string( $fields ) && $fields !== '' ) {
+			$field_keys = array_map( 'trim', explode( ',', $fields ) );
+		} elseif ( is_array( $fields ) ) {
+			$field_keys = $fields;
+		}
+
+		$translations = i18n_translate()->strings()->get_field_translations( $object_type, $object_id, $field_keys, $lang );
+		if ( $lang === '' ) {
+			$lang = json_i18n_get_current_language();
+		}
+
+		return new \WP_REST_Response( [
+			'success' => true,
+			'data'    => [
+				'object_type'  => $object_type,
+				'object_id'    => $object_id,
+				'lang'         => $lang,
+				'translations' => $translations,
+			],
+		] );
+	}
+
+	public function rest_save_field_translation( \WP_REST_Request $request ) {
+		$object_type = sanitize_key( (string) $request->get_param( 'object_type' ) );
+		$object_id   = (int) $request->get_param( 'object_id' );
+		$field_key   = sanitize_text_field( (string) $request->get_param( 'field_key' ) );
+		$lang        = sanitize_key( (string) $request->get_param( 'lang' ) );
+		$translation = (string) $request->get_param( 'translation' );
+
+		$ok = i18n_translate()->strings()->save_field_translation( $object_type, $object_id, $field_key, $lang, $translation );
+		if ( ! $ok ) {
+			return new \WP_REST_Response( [ 'success' => false, 'message' => 'Invalid parameters' ], 400 );
+		}
+
+		return new \WP_REST_Response( [
+			'success' => true,
+			'data'    => [
+				'object_type' => $object_type,
+				'object_id'   => $object_id,
+				'field_key'   => $field_key,
+				'lang'        => $lang,
+			],
+		] );
+	}
+
+	public function rest_delete_field_translation( \WP_REST_Request $request ) {
+		$object_type = sanitize_key( (string) $request->get_param( 'object_type' ) );
+		$object_id   = (int) $request->get_param( 'object_id' );
+		$field_key   = sanitize_text_field( (string) $request->get_param( 'field_key' ) );
+		$lang        = sanitize_key( (string) $request->get_param( 'lang' ) );
+
+		$ok = i18n_translate()->strings()->delete_field_translation( $object_type, $object_id, $field_key, $lang );
+		if ( ! $ok ) {
+			return new \WP_REST_Response( [ 'success' => false, 'message' => 'Invalid parameters' ], 400 );
+		}
+
+		return new \WP_REST_Response( [
+			'success' => true,
+			'data'    => [
+				'object_type' => $object_type,
+				'object_id'   => $object_id,
+				'field_key'   => $field_key,
+				'lang'        => $lang,
+			],
+		] );
+	}
+
+	public function rest_can_translate(): bool {
+		return current_user_can( 'i18n_translate_translate' );
 	}
 
 	public function ajax_change_language(): void {

@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 define( 'I18N_TRANSLATE_VERSION', '1.0.0' );
 define( 'I18N_TRANSLATE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'I18N_TRANSLATE_URL', plugin_dir_url( __FILE__ ) );
-define( 'I18N_TRANSLATE_DB_VERSION', '3' );
+define( 'I18N_TRANSLATE_DB_VERSION', '4' );
 
 require_once I18N_TRANSLATE_PATH . 'includes/Runtime/Plugin.php';
 

@@ -59,9 +59,22 @@ if ( ! function_exists( 'json_i18n_translate' ) ) {
 	}
 }
 
+if ( ! function_exists( 'json_i18n_translate_field' ) ) {
+	function json_i18n_translate_field( string $object_type, int $object_id, string $field_key, string $default = '', string $lang = '' ): string {
+		$translation = i18n_translate()->strings()->translate_field( $object_type, $object_id, $field_key, $default, $lang );
+		return apply_filters( 'json_i18n_field_translation', $translation, $object_type, $object_id, $field_key, $default, $lang );
+	}
+}
+
 if ( ! function_exists( 'json_i18n_get_translations' ) ) {
 	function json_i18n_get_translations( string $domain = '' ): array {
 		return i18n_translate()->strings()->get_translations_for_js( $domain );
+	}
+}
+
+if ( ! function_exists( 'json_i18n_get_field_translations' ) ) {
+	function json_i18n_get_field_translations( string $object_type, int $object_id, array $field_keys = [], string $lang = '' ): array {
+		return i18n_translate()->strings()->get_field_translations( $object_type, $object_id, $field_keys, $lang );
 	}
 }
 
