@@ -8,6 +8,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 final class Locale {
     private const COOKIE = 'i18n_translate_lang';
+    private const QUERY_ARG = 'i18n_lang';
+    private const LEGACY_QUERY_ARG = 'lang';
     private ?string $current_language_code = null;
 
     public function register(): void {
@@ -98,9 +100,9 @@ final class Locale {
         global $wpdb;
         $table = $wpdb->prefix . 'i18n_languages';
 
-        // Check if table exists before querying to avoid fatal errors during activation/early load if not installed
-        // However, usually installer runs first. Assuming table exists or empty return.
-        // Actually, simple valid query:
+        if ( $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table ) ) !== $table ) {
+            return [];
+        }
         
         $rows = $wpdb->get_results( "SELECT code, locale, name, native_name, rtl, flag, enabled, sort_order FROM {$table} WHERE enabled = 1 ORDER BY sort_order ASC", ARRAY_A );
         
@@ -136,10 +138,18 @@ final class Locale {
     }
 
     public function filter_pre_determine_locale( $locale ) {
+        if ( ! $this->should_apply_locale_for_request() ) {
+            return $locale;
+        }
+
         return $this->get_current_locale();
     }
 
     public function maybe_switch_to_locale(): void {
+        if ( ! $this->should_apply_locale_for_request() ) {
+            return;
+        }
+
         $current = $this->get_current_locale();
         $target = determine_locale();
         if ( $target && $target !== $current ) {
@@ -201,14 +211,60 @@ final class Locale {
     }
 
     private function get_requested_language_code(): ?string {
-        if ( isset( $_GET['lang'] ) ) {
-            $code = sanitize_key( wp_unslash( $_GET['lang'] ) );
+        if ( is_admin() && ! $this->is_plugin_admin_request() ) {
+            return null;
+        }
+
+        if ( isset( $_GET[ self::QUERY_ARG ] ) ) {
+            $code = sanitize_key( wp_unslash( $_GET[ self::QUERY_ARG ] ) );
             if ( $this->is_valid_language_code( $code ) ) {
                 $this->set_language_code( $code );
                 return $code;
             }
         }
+
+        if ( ! $this->allow_legacy_query_arg() ) {
+            return null;
+        }
+
+        if ( isset( $_GET[ self::LEGACY_QUERY_ARG ] ) ) {
+            $code = sanitize_key( wp_unslash( $_GET[ self::LEGACY_QUERY_ARG ] ) );
+            if ( $this->is_valid_language_code( $code ) ) {
+                $this->set_language_code( $code );
+                return $code;
+            }
+        }
+
         return null;
+    }
+
+    private function should_apply_locale_for_request(): bool {
+        if ( ! is_admin() ) {
+            return true;
+        }
+
+        return $this->is_plugin_admin_request();
+    }
+
+    private function allow_legacy_query_arg(): bool {
+        if ( ! is_admin() ) {
+            return true;
+        }
+
+        return $this->is_plugin_admin_request();
+    }
+
+    private function is_plugin_admin_request(): bool {
+        if ( ! is_admin() ) {
+            return false;
+        }
+
+        $page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $_GET['page'] ) ) : '';
+        if ( $page === '' ) {
+            return false;
+        }
+
+        return str_starts_with( $page, 'i18n-translate' );
     }
 
     public function is_valid_language_code( string $code ): bool {

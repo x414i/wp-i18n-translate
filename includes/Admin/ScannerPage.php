@@ -330,6 +330,7 @@ final class ScannerPage {
 	private function add_key( string $key ): bool {
 		global $wpdb;
 		$table = $wpdb->prefix . 'i18n_strings';
+		$domain = 'scanned';
 
 		if ( $wpdb->get_var( "SHOW TABLES LIKE '$table'" ) !== $table ) {
 			return false;
@@ -345,9 +346,9 @@ final class ScannerPage {
 		}
 
 		$result = $wpdb->insert( $table, [
+			'domain'       => $domain,
 			'string_key'   => $key,
 			'default_text' => '',
-			'context'      => 'scanned',
 		] );
 
 		return $result !== false;

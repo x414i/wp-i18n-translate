@@ -179,6 +179,10 @@ final class Admin {
 			return;
 		}
 
+		if ( is_admin() && ! $this->is_plugin_admin_request() ) {
+			return;
+		}
+
 		$languages = json_i18n_get_available_languages();
 		$current   = json_i18n_get_current_language();
 
@@ -202,7 +206,7 @@ final class Admin {
 		] );
 
 		foreach ( $languages as $code => $lang ) {
-			$url = add_query_arg( 'lang', $code );
+			$url = add_query_arg( 'i18n_lang', $code );
 			$label = '';
 			if ( ! empty( $lang['flag'] ) ) {
 				$label .= $lang['flag'] . ' ';
@@ -265,40 +269,53 @@ final class Admin {
 		$this->import_export_page->render();
 	}
 
-        public function seed_english_translations(): void {
-                if ( get_option( 'i18n_translate_seeded_en_v1' ) ) {
-                        return;
-                }
+	public function seed_english_translations(): void {
+		if ( get_option( 'i18n_translate_seeded_en_v1' ) ) {
+			return;
+		}
 
-                global $wpdb;
-                $strings_table = $wpdb->prefix . 'i18n_strings';
-                $tr_table      = $wpdb->prefix . 'i18n_translations';
+		global $wpdb;
+		$strings_table = $wpdb->prefix . 'i18n_strings';
+		$tr_table      = $wpdb->prefix . 'i18n_translations';
 
-                // Get all strings
-                $strings = $wpdb->get_results( "SELECT id, string_key, default_text FROM {$strings_table}" );
+		if ( $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $strings_table ) ) !== $strings_table ) {
+			return;
+		}
 
-                if ( ! empty( $strings ) ) {
-                        foreach ( $strings as $s ) {
-                                $existing = $wpdb->get_var( $wpdb->prepare( 
-                                        "SELECT id FROM {$tr_table} WHERE string_id = %d AND lang_code = 'en'", 
-                                        $s->id 
-                                ) );
-                        
-                                if ( ! $existing ) {
-                                        // Insert 'en' translation using default_text
-                                        $text = $s->default_text ? $s->default_text : $s->string_key;
-                                        $wpdb->insert( $tr_table, [
-                                                'string_id'        => $s->id,
-                                                'lang_code'        => 'en',
-                                                'translation_text' => $text,
-                                        ] );
-                                }
-                        }
-                }
+		if ( $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $tr_table ) ) !== $tr_table ) {
+			return;
+		}
 
-                update_option( 'i18n_translate_seeded_en_v1', '1' );
-                
-                // Seed demo keys if not already done
-                $this->seed_demo_keys();
-        }
+		$strings = $wpdb->get_results( "SELECT id, string_key, default_text FROM {$strings_table}" );
+
+		if ( ! empty( $strings ) ) {
+			foreach ( $strings as $s ) {
+				$existing = $wpdb->get_var( $wpdb->prepare(
+					"SELECT id FROM {$tr_table} WHERE string_id = %d AND lang_code = 'en'",
+					$s->id
+				) );
+
+				if ( ! $existing ) {
+					$text = $s->default_text ? $s->default_text : $s->string_key;
+					$wpdb->insert( $tr_table, [
+						'string_id'        => $s->id,
+						'lang_code'        => 'en',
+						'translation_text' => $text,
+					] );
+				}
+			}
+		}
+
+		update_option( 'i18n_translate_seeded_en_v1', '1' );
+	}
+
+	private function is_plugin_admin_request(): bool {
+		$page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $_GET['page'] ) ) : '';
+
+		if ( $page === '' ) {
+			return false;
+		}
+
+		return str_starts_with( $page, 'i18n-translate' );
+	}
 }

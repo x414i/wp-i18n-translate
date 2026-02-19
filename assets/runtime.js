@@ -32,23 +32,28 @@
 
 		try {
 			var url = new URL(window.location.href);
-			url.searchParams.set('lang', code);
+			url.searchParams.set('i18n_lang', code);
+			url.searchParams.delete('lang');
 			window.location.href = url.toString();
 		} catch (err) {
 			// Fallback for older browsers
 			window.location.href =
-				window.location.pathname + '?lang=' + encodeURIComponent(code);
+				window.location.pathname + '?i18n_lang=' + encodeURIComponent(code);
 		}
 	});
 })();
 
 // Simpler translation helper with placeholder interpolation
-window.__t = window.__t || function(key, domain, placeholders) {
- = domain || 'default';
-text = window.__(key, domain);
-(placeholders && typeof placeholders === 'object') {
-s(placeholders).forEach(function(placeholder) {
-regex = new RegExp('\\{' + placeholder + '\\}', 'g');
-= text.replace(regex, String(placeholders[placeholder]));
- text;
-};
+window.__t =
+	window.__t ||
+	function (key, domain, placeholders) {
+		domain = domain || 'default';
+		var text = window.__(key, domain);
+		if (placeholders && typeof placeholders === 'object') {
+			Object.keys(placeholders).forEach(function (placeholder) {
+				var regex = new RegExp('\\{' + placeholder + '\\}', 'g');
+				text = text.replace(regex, String(placeholders[placeholder]));
+			});
+		}
+		return text;
+	};

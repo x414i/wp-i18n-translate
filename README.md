@@ -68,13 +68,11 @@ workflow:
    [WordPress Plugin Directory](https://wordpress.org/plugins/i18n-translate/).
 
 2. **Install via WordPress Admin**
-
    - Go to **Plugins > Add New** in your WordPress dashboard.
    - Click **Upload Plugin** and select the downloaded ZIP file.
    - Click **Install Now** and then **Activate**.
 
 3. **Install via FTP**
-
    - Upload the `wp-i18n-translate` folder to `/wp-content/plugins/`.
    - Activate the plugin through the **Plugins** menu in WordPress.
 
@@ -102,7 +100,8 @@ WordPress.
 1. Create a translation key (e.g., `home.hero.title`).
 2. Add translations for each language.
 3. Insert the key using a block or shortcode.
-4. Preview with `?lang=fr` and add a language switcher.
+4. Preview with `?i18n_lang=fr` (legacy `?lang=fr` is still supported) and add a
+   language switcher.
 
 ### Which Editor Method Should I Use?
 

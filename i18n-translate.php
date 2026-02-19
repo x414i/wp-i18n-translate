@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: i18n Translate
- * Description: Translation management with JSON-key translations, language switching via ?lang=, REST/AJAX endpoints, and page builder compatibility.
+ * Description: Translation management with JSON-key translations, language switching via ?i18n_lang= (legacy ?lang= supported), REST/AJAX endpoints, and page builder compatibility.
  * Version: 1.0.0
  * Author: Satus
  * License: GPLv2 or later

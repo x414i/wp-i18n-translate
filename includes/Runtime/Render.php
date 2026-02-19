@@ -53,7 +53,7 @@ final class Render {
 		// flags/buttons: render links that keep existing query args.
 		$items = [];
 		foreach ( $languages as $code => $lang ) {
-			$url = add_query_arg( 'lang', $code );
+			$url = add_query_arg( 'i18n_lang', $code );
 			$text = $show_flags && ! empty( $lang['flag'] ) ? $lang['flag'] : '';
 			if ( $show_names ) {
 				$text .= ( $text !== '' ? ' ' : '' ) . ( $lang['native_name'] ?? $lang['name'] ?? $code );

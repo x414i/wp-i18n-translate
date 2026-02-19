@@ -47,7 +47,7 @@ final class DashboardPage {
 			<div class="i18n-quick-links">
 				<h2><?php esc_html_e( 'Quick Actions', 'i18n-translate' ); ?></h2>
 				<div class="i18n-links-grid">
-					<a href="<?php echo esc_url( admin_url( 'admin.php?page=i18n-translate' ) ); ?>" class="i18n-link-card">
+					<a href="<?php echo esc_url( admin_url( 'admin.php?page=i18n-translate-languages' ) ); ?>" class="i18n-link-card">
 						<span class="dashicons dashicons-flag"></span>
 						<span><?php esc_html_e( 'Languages', 'i18n-translate' ); ?></span>
 					</a>

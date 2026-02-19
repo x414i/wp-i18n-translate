@@ -13,7 +13,14 @@ final class ContentPage {
 		}
 
 		$languages = json_i18n_get_available_languages();
-		$current_lang = isset( $_GET['lang'] ) ? sanitize_key( wp_unslash( $_GET['lang'] ) ) : json_i18n_get_current_language();
+		$current_lang = '';
+		if ( isset( $_GET['i18n_lang'] ) ) {
+			$current_lang = sanitize_key( wp_unslash( $_GET['i18n_lang'] ) );
+		} elseif ( isset( $_GET['lang'] ) ) {
+			$current_lang = sanitize_key( wp_unslash( $_GET['lang'] ) );
+		} else {
+			$current_lang = json_i18n_get_current_language();
+		}
 		if ( ! isset( $languages[ $current_lang ] ) ) {
 			$current_lang = json_i18n_get_current_language();
 		}
@@ -77,7 +84,7 @@ final class ContentPage {
 					</label>
 					<label>
 						<span class="screen-reader-text"><?php esc_html_e( 'Language', 'i18n-translate' ); ?></span>
-						<select name="lang">
+						<select name="i18n_lang">
 							<?php foreach ( $languages as $code => $lang ) : ?>
 								<option value="<?php echo esc_attr( $code ); ?>" <?php selected( $current_lang, $code ); ?>>
 									<?php echo esc_html( ( $lang['flag'] ?? '🌐' ) . ' ' . ( $lang['name'] ?? $code ) ); ?>

@@ -108,7 +108,7 @@ final class Plugin {
 		add_filter( 'the_content', [ $this, 'filter_the_content' ], 10 );
 		add_filter( 'get_the_excerpt', [ $this, 'filter_the_excerpt' ], 10, 2 );
 		add_filter( 'term_name', [ $this, 'filter_term_name' ], 10, 3 );
-		add_filter( 'term_description', [ $this, 'filter_term_description' ], 10, 2 );
+		add_filter( 'term_description', [ $this, 'filter_term_description' ], 10, 3 );
 		add_filter( 'widget_title', [ $this, 'filter_widget_title' ], 10, 3 );
 
 		if ( class_exists( 'WooCommerce' ) ) {
@@ -121,7 +121,7 @@ final class Plugin {
 	}
 
 	public function filter_the_title( string $title, int $post_id = 0 ): string {
-		if ( is_admin() && ! wp_doing_ajax() ) {
+		if ( ! $this->should_translate_current_request() ) {
 			return $title;
 		}
 		if ( $post_id <= 0 ) {
@@ -131,7 +131,7 @@ final class Plugin {
 	}
 
 	public function filter_the_content( string $content ): string {
-		if ( is_admin() && ! wp_doing_ajax() ) {
+		if ( ! $this->should_translate_current_request() ) {
 			return $content;
 		}
 		global $post;
@@ -142,7 +142,7 @@ final class Plugin {
 	}
 
 	public function filter_the_excerpt( string $excerpt, $post = null ): string {
-		if ( is_admin() && ! wp_doing_ajax() ) {
+		if ( ! $this->should_translate_current_request() ) {
 			return $excerpt;
 		}
 		if ( $post instanceof \WP_Post ) {
@@ -151,22 +151,51 @@ final class Plugin {
 		return $excerpt;
 	}
 
-	public function filter_term_name( string $name, \WP_Term $term, string $taxonomy ): string {
-		if ( is_admin() && ! wp_doing_ajax() ) {
+	public function filter_term_name( string $name, $term, string $taxonomy = '' ): string {
+		if ( ! $this->should_translate_current_request() ) {
 			return $name;
 		}
-		return $this->strings()->translate_field( 'term', (int) $term->term_id, 'name', $name );
+
+		$term_id = $this->resolve_term_id( $term );
+		if ( $term_id <= 0 ) {
+			return $name;
+		}
+
+		return $this->strings()->translate_field( 'term', $term_id, 'name', $name );
 	}
 
-	public function filter_term_description( string $description, \WP_Term $term ): string {
-		if ( is_admin() && ! wp_doing_ajax() ) {
+	public function filter_term_description( string $description, $term, string $taxonomy = '' ): string {
+		if ( ! $this->should_translate_current_request() ) {
 			return $description;
 		}
-		return $this->strings()->translate_field( 'term', (int) $term->term_id, 'description', $description );
+
+		$term_id = $this->resolve_term_id( $term );
+		if ( $term_id <= 0 ) {
+			return $description;
+		}
+
+		return $this->strings()->translate_field( 'term', $term_id, 'description', $description );
+	}
+
+	private function resolve_term_id( $term ): int {
+		if ( $term instanceof \WP_Term ) {
+			return (int) $term->term_id;
+		}
+
+		if ( is_object( $term ) && isset( $term->term_id ) ) {
+			return (int) $term->term_id;
+		}
+
+		if ( is_numeric( $term ) ) {
+			$term_id = (int) $term;
+			return $term_id > 0 ? $term_id : 0;
+		}
+
+		return 0;
 	}
 
 	public function filter_widget_title( string $title, array $instance, string $id_base ): string {
-		if ( is_admin() && ! wp_doing_ajax() ) {
+		if ( ! $this->should_translate_current_request() ) {
 			return $title;
 		}
 		if ( $title === '' ) {
@@ -174,6 +203,31 @@ final class Plugin {
 		}
 		$key = 'widget.title.' . sanitize_key( $id_base ) . '.' . sanitize_title( $title );
 		return json_i18n_translate( $key, $title, 'widgets' );
+	}
+
+	private function should_translate_current_request(): bool {
+		if ( ! is_admin() ) {
+			return true;
+		}
+
+		if ( ! wp_doing_ajax() ) {
+			return false;
+		}
+
+		return $this->is_plugin_ajax_request();
+	}
+
+	private function is_plugin_ajax_request(): bool {
+		$action = isset( $_REQUEST['action'] ) ? sanitize_key( wp_unslash( $_REQUEST['action'] ) ) : '';
+		if ( $action === '' ) {
+			return false;
+		}
+
+		if ( str_starts_with( $action, 'i18n_' ) ) {
+			return true;
+		}
+
+		return in_array( $action, [ 'change_language', 'search_suggestions' ], true );
 	}
 
 	public function filter_wc_product_name( string $name, $product ): string {

@@ -210,7 +210,7 @@ final class UsagePage {
 			<h3><?php esc_html_e( 'How Language Detection Works', 'i18n-translate' ); ?></h3>
 			<p><?php esc_html_e( 'The current language is determined in this order:', 'i18n-translate' ); ?></p>
 			<ol>
-				<li><strong><?php esc_html_e( 'URL Parameter:', 'i18n-translate' ); ?></strong> <?php esc_html_e( 'Add ?lang=fr to any URL to switch languages', 'i18n-translate' ); ?></li>
+				<li><strong><?php esc_html_e( 'URL Parameter:', 'i18n-translate' ); ?></strong> <?php esc_html_e( 'Add ?i18n_lang=fr to any URL to switch languages (legacy ?lang= still works)', 'i18n-translate' ); ?></li>
 				<li><strong><?php esc_html_e( 'Cookie:', 'i18n-translate' ); ?></strong> <?php esc_html_e( 'The selected language is saved in a cookie for return visits', 'i18n-translate' ); ?></li>
 				<li><strong><?php esc_html_e( 'Default Language:', 'i18n-translate' ); ?></strong> <?php esc_html_e( 'Falls back to your configured default language', 'i18n-translate' ); ?></li>
 			</ol>
@@ -874,7 +874,7 @@ final class UsagePage {
 				</div>
 				<div class="i18n-step">
 					<h4>📦 <?php esc_html_e( 'Page Caching', 'i18n-translate' ); ?></h4>
-					<p><?php esc_html_e( 'Use page caching plugins (WP Super Cache, W3 Total Cache). Configure separate cache per language using the ?lang= parameter.', 'i18n-translate' ); ?></p>
+					<p><?php esc_html_e( 'Use page caching plugins (WP Super Cache, W3 Total Cache). Configure separate cache per language using the ?i18n_lang= parameter (legacy ?lang= also supported).', 'i18n-translate' ); ?></p>
 				</div>
 				<div class="i18n-step">
 					<h4>🔄 <?php esc_html_e( 'Cache Invalidation', 'i18n-translate' ); ?></h4>
