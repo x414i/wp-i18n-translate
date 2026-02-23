@@ -14,6 +14,7 @@ final class UsagePage {
 		}
 		?>
 		<style>
+			/* الأنماط كما هي دون تغيير */
 			.i18n-usage-wrap { max-width: 1200px; }
 			.i18n-usage-header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; padding: 40px; border-radius: 12px; margin-bottom: 30px; }
 			.i18n-usage-header h1 { margin: 0 0 10px; font-size: 32px; font-weight: 600; }
@@ -416,16 +417,20 @@ final class UsagePage {
 
 			<h3><?php esc_html_e( 'Language Switcher', 'i18n-translate' ); ?></h3>
 			<div class="i18n-code-box">
-				<button class="copy-btn" @click="copy('[i18n_switcher]')">Copy</button>
+				<button class="copy-btn" @click="copy('[i18n_switcher style=&quot;dropdown&quot;]')">Copy</button>
 				[i18n_switcher]<br>
-				[i18n_switcher style="list" show_flags="true" show_names="false"]
+				[i18n_switcher style="list" show_flags="false" show_names="true"]<br>
+				[i18n_switcher style="flags-only" class="my-switcher"]<br>
+				[i18n_switcher style="names-only" show_flags="false"]<br>
+				[i18n_switcher style="inline"]
 			</div>
 			<table class="i18n-table">
 				<thead><tr><th><?php esc_html_e( 'Attribute', 'i18n-translate' ); ?></th><th><?php esc_html_e( 'Description', 'i18n-translate' ); ?></th></tr></thead>
 				<tbody>
-					<tr><td><code>style</code></td><td><?php esc_html_e( 'dropdown (default) or list', 'i18n-translate' ); ?></td></tr>
+					<tr><td><code>style</code></td><td><?php esc_html_e( 'Display style: dropdown (default), list, inline, flags-only, names-only', 'i18n-translate' ); ?></td></tr>
 					<tr><td><code>show_flags</code></td><td><?php esc_html_e( 'Show flag emojis (true/false)', 'i18n-translate' ); ?></td></tr>
 					<tr><td><code>show_names</code></td><td><?php esc_html_e( 'Show language names (true/false)', 'i18n-translate' ); ?></td></tr>
+					<tr><td><code>class</code></td><td><?php esc_html_e( 'Additional CSS class for the wrapper', 'i18n-translate' ); ?></td></tr>
 				</tbody>
 			</table>
 		</div>
@@ -669,11 +674,11 @@ final class UsagePage {
 			<ol>
 				<li><?php esc_html_e( 'Go to Appearance → Menus', 'i18n-translate' ); ?></li>
 				<li><?php esc_html_e( 'Add a Custom Link', 'i18n-translate' ); ?></li>
-				<li><?php esc_html_e( 'URL:', 'i18n-translate' ); ?> <code>#i18n-switcher</code></li>
+				<li><?php esc_html_e( 'URL:', 'i18n-translate' ); ?> <code>#i18n-switcher</code> <?php esc_html_e( '(or with style: #i18n-switcher?style=list)', 'i18n-translate' ); ?></li>
 				<li><?php esc_html_e( 'Link Text: "Language" or your preferred label', 'i18n-translate' ); ?></li>
 			</ol>
 			<div class="i18n-info-box">
-				<?php esc_html_e( 'For list style instead of dropdown:', 'i18n-translate' ); ?> <code>#i18n-switcher?style=list</code>
+				<?php esc_html_e( 'Available styles: dropdown (default), list, inline, flags-only, names-only. Example:', 'i18n-translate' ); ?> <code>#i18n-switcher?style=list</code>
 			</div>
 
 			<h3><?php esc_html_e( 'Method 2: Widget', 'i18n-translate' ); ?></h3>
@@ -682,7 +687,7 @@ final class UsagePage {
 			<h3><?php esc_html_e( 'Method 3: Shortcode in Menu', 'i18n-translate' ); ?></h3>
 			<p><?php esc_html_e( 'Some themes support shortcodes in menu items. If your theme does:', 'i18n-translate' ); ?></p>
 			<div class="i18n-code-box">
-				[i18n_switcher style="list" show_flags="true"]
+				[i18n_switcher style="list" show_flags="true" class="menu-item-lang"]
 			</div>
 
 			<h3><?php esc_html_e( 'Method 4: PHP (Theme Development)', 'i18n-translate' ); ?></h3>
