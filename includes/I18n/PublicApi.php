@@ -155,13 +155,16 @@ final class PublicApi {
                          'style'      => 'dropdown',
                          'show_flags' => 'true',
                          'show_names' => 'true',
+                        'class'      => '',           
                     ], (array) $atts );
 
                     $style      = sanitize_text_field( (string) $atts['style'] );
                     $show_flags = filter_var( $atts['show_flags'], FILTER_VALIDATE_BOOLEAN );
                     $show_names = filter_var( $atts['show_names'], FILTER_VALIDATE_BOOLEAN );
+                    $class      = sanitize_html_class( $atts['class'] );
 
-                    return i18n_translate()->render()->language_switcher( $style, $show_flags, $show_names );
+
+                    return i18n_translate()->render()->language_switcher( $style, $show_flags, $show_names, $class );
                 } );
 
                 // Media Support

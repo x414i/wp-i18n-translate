@@ -1,0 +1,53 @@
+.i18n-language-switcher {
+    display: inline-block;
+}
+.i18n-language-switcher ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+.i18n-language-switcher li {
+    display: inline-block;
+    margin-right: 10px;
+}
+.i18n-language-switcher a {
+    text-decoration: none;
+    padding: 5px 10px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+}
+.i18n-language-switcher a.active {
+    background-color: #0073aa;
+    color: #fff;
+    border-color: #0073aa;
+}
+
+.i18n-language-switcher.dropdown {
+    position: relative;
+}
+.i18n-language-switcher.dropdown .current-language {
+    cursor: pointer;
+    padding: 5px 10px;
+    border: 1px solid #ccc;
+}
+.i18n-language-switcher.dropdown ul {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: #fff;
+    border: 1px solid #ccc;
+    z-index: 1000;
+}
+.i18n-language-switcher.dropdown:hover ul {
+    display: block;
+}
+.i18n-language-switcher.dropdown li {
+    display: block;
+    margin: 0;
+}
+.i18n-language-switcher.dropdown a {
+    display: block;
+    border: none;
+    padding: 8px 12px;
+}

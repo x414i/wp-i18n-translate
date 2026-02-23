@@ -281,6 +281,7 @@ final class Plugin {
 			'ajax_url'      => admin_url( 'admin-ajax.php' ),
 			'nonce'         => wp_create_nonce( 'wp_template_nonce' ),
 		] );
+    wp_enqueue_style( 'i18n-translate-public', I18N_TRANSLATE_URL . 'assets/public.css', [], I18N_TRANSLATE_VERSION );
 
 		wp_enqueue_script( 'i18n-translate-runtime' );
 	}
