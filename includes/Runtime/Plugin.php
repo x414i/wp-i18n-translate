@@ -49,6 +49,7 @@ final class Plugin {
 		require_once I18N_TRANSLATE_PATH . 'includes/Runtime/Strings.php';
 		require_once I18N_TRANSLATE_PATH . 'includes/Runtime/Render.php';
 		require_once I18N_TRANSLATE_PATH . 'includes/Runtime/LanguageSwitcherWidget.php';
+		require_once I18N_TRANSLATE_PATH . 'includes/Admin/Menus.php';
 
 		( new Installer() )->maybe_upgrade();
 		$this->services = new Services();
@@ -66,6 +67,7 @@ final class Plugin {
 
 		if ( is_admin() ) {
 			( new Admin() )->register();
+			  ( new \I18nTranslate\Admin\Menus() )->register();
 		}
 
 		$this->register_blocks();
