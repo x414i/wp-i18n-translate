@@ -311,4 +311,4 @@ WordPress support forum.
 
 ### License 📜
 This project is licensed under the GPL v2 or later - see the LICENSE
-file for details.
+file for details.c
