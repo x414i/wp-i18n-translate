@@ -3,7 +3,7 @@
 [![WordPress Plugin](https://img.shields.io/badge/WordPress-5.0+-blue.svg)](https://wordpress.org/plugins/i18n-translate/)
 [![PHP](https://img.shields.io/badge/PHP-7.4+-purple.svg)](https://php.net/)
 [![License](https://img.shields.io/badge/License-GPL%20v2%2B-green.svg)](https://opensource.org/licenses/GPL-2.0)
-[![Version](https://img.shields.io/badge/Version-1.0.0-orange.svg)](https://github.com/yourusername/wp-i18n-translate)
+[![Version](https://img.shields.io/badge/Version-1.0.1-orange.svg)](https://github.com/x414i/wp-i18n-translate)
 
 > A modern translation management plugin for WordPress with a card-based admin
 > interface.
@@ -34,11 +34,10 @@ workflow:
 - **Card-based Languages Management** 🗂️: Beautiful grid layout with emoji flags
   for easy language overview.
 - **Translations Editor** ✏️: Inline editing with search and pagination for
-  efficient translation management.
+efficient translation management.
 - **String Management** 🔧: Full CRUD operations with bulk add support for
   translation keys.
-- **Language Switcher** 🌐: Integrates with admin bar, widgets, menus, and
-  shortcodes.
+- **Language Switcher** 🌐: Multiple display styles (dropdown, list, inline, flags-only, names-only) with flag and name options. Integrates with admin bar, widgets, menus (via magic link `#i18n-switcher`), and shortcodes.
 - **Automatic Fallback** 🔄: Falls back to default language if translation is
   missing.
 - **Settings Page** ⚙️: Configure default language and auto-detection.
@@ -63,7 +62,7 @@ workflow:
 
 1. **Download the Plugin**  
    Download the latest release from
-   [GitHub Releases](https://github.com/yourusername/wp-i18n-translate/releases)
+   [GitHub Releases](https://github.com/x414i/wp-i18n-translate/releases)
    or the
    [WordPress Plugin Directory](https://wordpress.org/plugins/i18n-translate/).
 
@@ -121,14 +120,25 @@ WordPress.
 
 ### Shortcodes
 
-| Shortcode                             | Purpose             |
-| ------------------------------------- | ------------------- |
-| `[i18n "key"]`                        | Translate text      |
-| `[i18n "key" default="Fallback"]`     | With fallback       |
-| `[i18n "key" tag="h1" class="title"]` | With HTML wrapper   |
-| `[i18n_image "key"]`                  | Translate image     |
-| `[i18n_switcher]`                     | Language switcher   |
-| `[i18n_switcher style="list"]`        | List-style switcher |
+| Shortcode                             | Purpose                          |
+| ------------------------------------- | -------------------------------- |
+| `[i18n "key"]`                        | Translate text                   |
+| `[i18n "key" default="Fallback"]`     | With fallback                    |
+| `[i18n "key" tag="h1" class="title"]` | With HTML wrapper                |
+| `[i18n_image "key"]`                  | Translate image                  |
+| `[i18n_switcher]`                     | Language switcher (dropdown)     |
+| `[i18n_switcher style="list"]`        | List-style switcher              |
+| `[i18n_switcher style="inline"]`      | Inline links                     |
+| `[i18n_switcher style="flags-only"]`  | Flags only                       |
+| `[i18n_switcher style="names-only"]`  | Language names only              |
+| `[i18n_switcher class="my-class"]`    | Add custom CSS class             |
+
+**Example:**
+`[i18n_switcher style="list" show_flags="true" show_names="true" class="header-switcher"]`
+
+### Language Switcher in Menus
+
+Add a **Custom Link** with URL `#i18n-switcher` to any menu. The plugin will automatically replace it with the language switcher. You can also specify a style by adding a query parameter: `#i18n-switcher?style=list`. Works in Classic and Block Themes.
 
 ### eCommerce (WooCommerce)
 
@@ -158,70 +168,60 @@ echo __t( 'product.featured_badge', 'Featured' );
 echo __t( 'shop.sort_by', 'Sort by' );
 echo __t( 'cart.empty', 'Your cart is empty' );
 ```
-
-```html
+```php
 <!-- In product short description or builder content -->
 [i18n "product.shipping_note" default="Free shipping over $50"] [i18n
 "checkout.secure" default="Secure checkout"]
 ```
 
-**Page-by-page key map**:
+### Page-by-page key map:
 
 - **Shop (archive-product.php):** `shop.title`, `shop.sort_by`, `shop.filter_by`
 - **Product (single-product.php):** `product.add_to_cart`, `product.tabs.*`
 - **Cart (cart.php):** `cart.title`, `cart.empty`, `cart.continue_shopping`
 - **Checkout (checkout.php):** `checkout.title`, `checkout.secure`,
-  `checkout.notice.*`
+`checkout.notice.*`
 - **Thank You (thankyou.php):** `checkout.thank_you`, `checkout.order_summary`
-
-**Product images per language**:
-
+### Product images per language:
 ```php
 // Use i18n image keys for localized product graphics
 echo __img( 'product.hero_image', 'large' );
 ```
 
-### Blogs & Posts
-
-For blogs, use keys for **recurring UI text** (read more, share labels,
+## Blogs & Posts
+For blogs, use keys for recurring UI text (read more, share labels,
 headings) and keep post content in the editor as normal. This keeps templates
 consistent across all posts.
 
-**Translate vs Keep in Content**:
+**Translate vs Keep in Content:**
 
 - ✅ Translate: template labels, buttons, CTAs, archive headings, empty states.
 - ⛔ Keep in post content: article body text, quotes, and custom one‑off copy.
 
-**Recommended key groups**:
-
+**Recommended key groups:**
 - `blog.*` (read more, categories, tags, author labels)
 - `post.*` (share labels, table-of-contents headings)
 - `archive.*` (archive titles, filters, empty states)
 
-**Examples**:
-
+**Examples:**
 ```php
 // In archive.php or single.php
 echo __t( 'blog.read_more', 'Read more' );
 echo __t( 'blog.published_on', 'Published on' );
 echo __t( 'archive.no_results', 'No posts found' );
 ```
-
-```html
+```php
 <!-- In post content or pattern -->
 [i18n "blog.subscribe_cta" default="Subscribe for updates"]
 ```
-
-**Template key map**:
-
+### Template key map:
 - **Archive (archive.php):** `archive.title`, `archive.no_results`,
-  `blog.read_more`
+`blog.read_more`
 - **Single post (single.php):** `blog.published_on`, `post.share`, `post.author`
 - **Pagination:** `archive.prev`, `archive.next`
 - **Author box:** `post.about_author`, `post.author_posts`
 
-### PHP Helper Functions
-
+## PHP Helper Functions
 ```php
 // Translate text
 echo __t( 'nav.home' );
@@ -240,7 +240,6 @@ __switcher( 'list', ['show_flags' => true] );
 ```
 
 ### Hooks & Filters
-
 ```php
 // Modify translation output
 add_filter( 'json_i18n_translation', function( $translation, $key, $default, $domain ) {
@@ -263,23 +262,16 @@ add_action( 'json_i18n_after_language_change', function( $old, $new ) {
 }, 10, 2 );
 ```
 
-### Menu Integration
-
-Add a **Custom Link** with URL `#i18n-switcher` to any menu. Works in Classic
-and Block Themes.
-
 ### Configuration
+Go to i18n Translate → Settings to configure:
 
-Go to **i18n Translate → Settings** to configure:
+- Default Language: Fallback when no translation exists
+- Auto Detect: Detect language from browser
 
-- **Default Language**: Fallback when no translation exists
-- **Auto Detect**: Detect language from browser
-
-The plugin includes a comprehensive **Usage Guide** (i18n Translate → Usage
+The plugin includes a comprehensive Usage Guide (i18n Translate → Usage
 Guide) with tutorials, integrations, and troubleshooting.
 
-## Contributing 🤝
-
+### Contributing 🤝
 Contributions are welcome! If you have an improvement or a new feature, please
 follow these steps:
 
@@ -290,37 +282,33 @@ follow these steps:
 
 ✨ Contributors
 
-Made with [contrib.rocks](https://contrib.rocks).
+Made with contrib.rocks.
 
-## Future Enhancements 🔮
-
+### Future Enhancements 🔮
 We have a few ideas for future enhancements. Feel free to contribute or suggest
 new ones!
 
-- **Advanced Import/Export**: Support for more formats like XLIFF or PO files.
-- **Machine Translation Integration**: Integrate with services like Google
-  Translate or DeepL for automatic translations.
-- **Multisite Support**: Enhanced features for WordPress Multisite networks.
-- **Performance Optimizations**: Caching layers and lazy loading for better
-  performance on large sites.
-- **Theme Integration**: Deeper integration with popular themes and page
-  builders.
-- **Analytics Dashboard**: Track translation usage and missing translations.
-- **CLI Tools**: Command-line interface for bulk operations and migrations.
+- **Advanced Import/Export:** Support for more formats like XLIFF or PO files.
+- **Machine Translation Integration:** Integrate with services like Google
+Translate or DeepL for automatic translations.
+- **Multisite Support:** Enhanced features for WordPress Multisite networks.
+- **Performance Optimizations:** Caching layers and lazy loading for better
+performance on large sites.
+- **Theme Integration:** Deeper integration with popular themes and page
+builders.
+- **Analytics Dashboard:** Track translation usage and missing translations.
+- **CLI Tools:** Command-line interface for bulk operations and migrations.
 
-## Getting Help 🆘
+### Getting Help 🆘
 
 If you encounter any issues or have questions, please:
 
-- Check the built-in **Usage Guide** in the plugin.
+- Check the built-in Usage Guide in the plugin.
 - Open an issue on the
-  [GitHub repository](https://github.com/yourusername/wp-i18n-translate/issues).
+GitHub repository.
 - Join the discussion in the
-  [WordPress support forum](https://wordpress.org/support/plugin/i18n-translate/).
+WordPress support forum.
 
-## License 📜
-
-This project is licensed under the GPL v2 or later - see the [LICENSE](LICENSE)
+### License 📜
+This project is licensed under the GPL v2 or later - see the LICENSE
 file for details.
-
----
