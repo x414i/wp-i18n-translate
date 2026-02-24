@@ -1816,3 +1816,18 @@
 		flex-shrink: 0;
 	}
 }
+
+
+.i18n-switcher-fields {
+    background: #f9f9f9;
+    border-radius: 4px;
+    padding: 10px;
+}
+.i18n-switcher-fields .description-thin {
+    float: left;
+    width: 50%;
+    margin: 0;
+}
+.i18n-switcher-fields .description-thin input[type="checkbox"] {
+    margin-right: 5px;
+}
